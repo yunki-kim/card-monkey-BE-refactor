@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"회원 서비스"}, description = "회원 서비스를 담당합니다.")
@@ -26,7 +28,7 @@ public class MemberController {
      */
     @PatchMapping("/info/changePassword")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호를 확인 후 변경합니다.")
-    public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody PasswordReqDTO req) {
+    public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody @Valid PasswordReqDTO req) {
         // if (req.getCurrentPassword() == null || req.getNewPassword() == null) {
         //     return "모든 값을 입력해주세요";
         // }

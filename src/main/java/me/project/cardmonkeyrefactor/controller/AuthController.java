@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"인증 서비스"}, description = "인증 서비스를 담당합니다.")
@@ -29,7 +31,7 @@ public class AuthController {
      */
     @PostMapping("/signup")
     @ApiOperation(value = "회원가입", notes = "회원가입을 수행합니다.")
-    public ResponseEntity<String> signUp(@RequestBody SignupReqDTO req) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid SignupReqDTO req) {
         // if (req.getUserId() == null || req.getPassword() == null || req.getName() == null) {
         //     return "모든 값을 입력해주세요";
         // }
@@ -41,7 +43,7 @@ public class AuthController {
      */
     @PostMapping("/userIdValidation")
     @ApiOperation(value = "아이디 중복체크", notes = "회원가입시 아이디 중복체크를 수행합니다.")
-    public ResponseEntity<String> userIdValidation(@RequestBody ValidationDTO req) {
+    public ResponseEntity<String> userIdValidation(@RequestBody @Valid ValidationDTO req) {
         // if (req.getUserId() == null) {
         //     return "아이디를 입력해주세요";
         // }
@@ -53,7 +55,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     @ApiOperation(value = "로그인", notes = "로그인을 수행합니다.")
-    public ResponseEntity<LoginResDTO> signIn(@RequestBody LoginReqDTO req) {
+    public ResponseEntity<LoginResDTO> signIn(@RequestBody @Valid LoginReqDTO req) {
         // if (req.getUserId() == null || req.getPassword() == null) {
         //     return new LoginResDTO("아이디와 비밀번호 모두 입력해주세요");
         // }
