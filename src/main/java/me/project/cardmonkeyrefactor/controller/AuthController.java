@@ -10,6 +10,7 @@ import me.project.cardmonkeyrefactor.dto.ValidationDTO;
 import me.project.cardmonkeyrefactor.entity.Token;
 import me.project.cardmonkeyrefactor.repository.TokenRepository;
 import me.project.cardmonkeyrefactor.service.MemberService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,11 +29,11 @@ public class AuthController {
      */
     @PostMapping("/signup")
     @ApiOperation(value = "회원가입", notes = "회원가입을 수행합니다.")
-    public String signUp(@RequestBody SignupReqDTO req) {
-        if (req.getUserId() == null || req.getPassword() == null || req.getName() == null) {
-            return "모든 값을 입력해주세요";
-        }
-        return memberService.join(req);
+    public ResponseEntity<String> signUp(@RequestBody SignupReqDTO req) {
+        // if (req.getUserId() == null || req.getPassword() == null || req.getName() == null) {
+        //     return "모든 값을 입력해주세요";
+        // }
+        return ResponseEntity.ok(memberService.join(req));
     }
 
     /**
@@ -40,11 +41,11 @@ public class AuthController {
      */
     @PostMapping("/userIdValidation")
     @ApiOperation(value = "아이디 중복체크", notes = "회원가입시 아이디 중복체크를 수행합니다.")
-    public String userIdValidation(@RequestBody ValidationDTO req) {
-        if (req.getUserId() == null) {
-            return "아이디를 입력해주세요";
-        }
-        return memberService.userIdValidation(req);
+    public ResponseEntity<String> userIdValidation(@RequestBody ValidationDTO req) {
+        // if (req.getUserId() == null) {
+        //     return "아이디를 입력해주세요";
+        // }
+        return ResponseEntity.ok(memberService.userIdValidation(req));
     }
 
     /**
@@ -52,11 +53,11 @@ public class AuthController {
      */
     @PostMapping("/login")
     @ApiOperation(value = "로그인", notes = "로그인을 수행합니다.")
-    public LoginResDTO signIn(@RequestBody LoginReqDTO req) {
-        if (req.getUserId() == null || req.getPassword() == null) {
-            return new LoginResDTO("아이디와 비밀번호 모두 입력해주세요");
-        }
-        return memberService.login(req);
+    public ResponseEntity<LoginResDTO> signIn(@RequestBody LoginReqDTO req) {
+        // if (req.getUserId() == null || req.getPassword() == null) {
+        //     return new LoginResDTO("아이디와 비밀번호 모두 입력해주세요");
+        // }
+        return ResponseEntity.ok(memberService.login(req));
     }
 
     /**
@@ -64,8 +65,9 @@ public class AuthController {
      */
     @PostMapping("/logout")
     @ApiOperation(value = "로그아웃", notes = "로그아웃을 수행합니다.")
-    public String signOut(@RequestHeader(name="Authorization") String header) {
+    public ResponseEntity<String> signOut(@RequestHeader(name="Authorization") String header) {
         tokenRepository.save(Token.builder().token(header).build());
-        return "로그아웃 완료";
+
+        return ResponseEntity.ok("로그아웃 완료");
     }
 }

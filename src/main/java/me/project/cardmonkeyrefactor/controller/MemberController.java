@@ -7,6 +7,7 @@ import me.project.cardmonkeyrefactor.dto.AuthDTO;
 import me.project.cardmonkeyrefactor.dto.ChangeBenefitReqDTO;
 import me.project.cardmonkeyrefactor.dto.PasswordReqDTO;
 import me.project.cardmonkeyrefactor.service.MemberService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,16 +26,17 @@ public class MemberController {
      */
     @PatchMapping("/info/changePassword")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호를 확인 후 변경합니다.")
-    public String changePassword(Authentication authentication, @RequestBody PasswordReqDTO req) {
-        if (req.getCurrentPassword() == null || req.getNewPassword() == null) {
-            return "모든 값을 입력해주세요";
-        }
-        if (req.getCurrentPassword().equals(req.getNewPassword())) {
-            return "입력하신 두 비밀번호가 동일합니다.";
-        }
+    public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody PasswordReqDTO req) {
+        // if (req.getCurrentPassword() == null || req.getNewPassword() == null) {
+        //     return "모든 값을 입력해주세요";
+        // }
+        // if (req.getCurrentPassword().equals(req.getNewPassword())) {
+        //     return "입력하신 두 비밀번호가 동일합니다.";
+        // }
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
-        return memberService.updatePassword(userId, req);
+
+        return ResponseEntity.ok(memberService.updatePassword(userId, req));
     }
 
     /**
@@ -42,10 +44,11 @@ public class MemberController {
      */
     @PatchMapping("/info/changeBenefit")
     @ApiOperation(value = "혜택 변경", notes = "회원가입시 선택했던 3가지의 혜택을 수정합니다.")
-    public String changeBenefit(Authentication authentication, @RequestBody ChangeBenefitReqDTO req) {
+    public ResponseEntity<String> changeBenefit(Authentication authentication, @RequestBody ChangeBenefitReqDTO req) {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
-        return memberService.changeBenefit(userId, req);
+
+        return ResponseEntity.ok(memberService.changeBenefit(userId, req));
     }
 
     /**
@@ -53,9 +56,10 @@ public class MemberController {
      */
     @DeleteMapping("/info/deleteAccount")
     @ApiOperation(value = "회원 탈퇴", notes = "회원을 탈퇴합니다.")
-    public String deleteAccount(Authentication authentication) {
+    public ResponseEntity<String> deleteAccount(Authentication authentication) {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
-        return memberService.deleteAccount(userId);
+
+        return ResponseEntity.ok(memberService.deleteAccount(userId));
     }
 }
