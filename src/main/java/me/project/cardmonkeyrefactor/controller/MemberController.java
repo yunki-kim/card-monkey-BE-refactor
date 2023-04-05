@@ -29,9 +29,6 @@ public class MemberController {
     @PatchMapping("/info/changePassword")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호를 확인 후 변경합니다.")
     public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody @Valid PasswordReqDTO req) {
-        // if (req.getCurrentPassword() == null || req.getNewPassword() == null) {
-        //     return "모든 값을 입력해주세요";
-        // }
         // if (req.getCurrentPassword().equals(req.getNewPassword())) {
         //     return "입력하신 두 비밀번호가 동일합니다.";
         // }
