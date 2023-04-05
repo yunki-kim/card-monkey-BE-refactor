@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.project.cardmonkeyrefactor.dto.*;
 import me.project.cardmonkeyrefactor.entity.Benefit;
 import me.project.cardmonkeyrefactor.entity.Member;
-import me.project.cardmonkeyrefactor.exception.NoSuchMemberException;
+import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.jwt.JwtProvider;
 import me.project.cardmonkeyrefactor.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
