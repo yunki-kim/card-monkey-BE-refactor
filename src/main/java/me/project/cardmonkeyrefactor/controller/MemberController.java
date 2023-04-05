@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import me.project.cardmonkeyrefactor.dto.AuthDTO;
 import me.project.cardmonkeyrefactor.dto.ChangeBenefitReqDTO;
 import me.project.cardmonkeyrefactor.dto.PasswordReqDTO;
+import me.project.cardmonkeyrefactor.exception.member.DuplicateInputPasswordException;
 import me.project.cardmonkeyrefactor.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,9 +30,9 @@ public class MemberController {
     @PatchMapping("/info/changePassword")
     @ApiOperation(value = "비밀번호 변경", notes = "비밀번호를 확인 후 변경합니다.")
     public ResponseEntity<String> changePassword(Authentication authentication, @RequestBody @Valid PasswordReqDTO req) {
-        // if (req.getCurrentPassword().equals(req.getNewPassword())) {
-        //     return "입력하신 두 비밀번호가 동일합니다.";
-        // }
+        if (req.getCurrentPassword().equals(req.getNewPassword())) {
+            throw new DuplicateInputPasswordException();
+        }
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
