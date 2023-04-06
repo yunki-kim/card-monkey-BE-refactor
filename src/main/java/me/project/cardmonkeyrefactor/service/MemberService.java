@@ -5,6 +5,7 @@ import me.project.cardmonkeyrefactor.dto.*;
 import me.project.cardmonkeyrefactor.entity.Benefit;
 import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.exception.member.AlreadyUseIdException;
+import me.project.cardmonkeyrefactor.exception.member.MismatchCurrentPasswordException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.jwt.JwtProvider;
 import me.project.cardmonkeyrefactor.repository.MemberRepository;
@@ -74,8 +75,7 @@ public class MemberService {
                 NoSuchMemberException::new);
 
         if (!checkPassword(req.getCurrentPassword(), findMember.getPassword())) {
-            // return "현재 비밀번호가 일치하지 않습니다.";
-            return;
+            throw new MismatchCurrentPasswordException();
         }
         findMember.updatePassword(encodingPassword(req.getNewPassword()));
     }
