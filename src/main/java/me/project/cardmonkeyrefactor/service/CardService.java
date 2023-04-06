@@ -219,19 +219,35 @@ public class CardService {
     }
 
     /**
-     * 찜하기 or 찜하기 취소
+     * 카드 찜하기
      */
     @Transactional
-    public String saveAndCancelFavor(String userId, Long cardId) {
+    public String saveFavor(String userId, Long cardId) {
+        Member findMember = memberRepository.findByUserId(userId).orElseThrow(
+                NoSuchMemberException::new);
+        Card findCard = cardRepository.findById(cardId).orElseThrow(
+                NoSuchCardException::new);
+
+        if (checkExistsFavor(findMember.getId(), findCard.getId())) {
+            return "이미 찜한 카드입니다.";
+        }
+        Favor favor = Favor.createFavor(findMember, findCard);
+        favorRepository.save(favor);
+        return "찜하기 완료";
+    }
+
+    /**
+     * 카드 찜하기 취소
+     */
+    @Transactional
+    public String cancelFavor(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (!checkExistsFavor(findMember.getId(), findCard.getId())) {
-            Favor favor = Favor.createFavor(findMember, findCard);
-            favorRepository.save(favor);
-            return "찜하기 완료";
+            return "찜하지 않은 카드입니다.";
         }
         favorRepository.deleteByMemberIdAndCardId(findMember.getId(), findCard.getId());
         return "찜하기 취소 완료";

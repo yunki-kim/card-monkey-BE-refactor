@@ -108,7 +108,7 @@ public class CardController {
      * 나의 관심(찜) 카드 내역
      */
     @GetMapping("/info/favor")
-    @ApiOperation(value = "찜한 카드 내역", notes = "내가 찜한 카드들의 내역을 조회합니다.")
+    @ApiOperation(value = "찜한 카드 내역", notes = "찜한 카드 내역을 조회합니다.")
     public ResponseEntity<List<CardResDTO>> FavorCardList(Authentication authentication) {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
@@ -141,14 +141,26 @@ public class CardController {
     }
 
     /**
-     * 찜하기 or 찜하기 취소
+     * 카드 찜하기
      */
     @PostMapping("/card/favor/{cardId}")
-    @ApiOperation(value = "찜 기능", notes = "유저가 카드를 찜 하거나 찜 취소를 할 수 있습니다.")
-    public ResponseEntity<String> favorCardSave(Authentication authentication, @PathVariable Long cardId) {
+    @ApiOperation(value = "카드 찜하기", notes = "카드를 찜 할 수 있습니다.")
+    public ResponseEntity<String> favorCardAdd(Authentication authentication, @PathVariable Long cardId) {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(cardService.saveAndCancelFavor(userId, cardId));
+        return ResponseEntity.ok(cardService.saveFavor(userId, cardId));
+    }
+
+    /**
+     * 카드 찜하기 취소
+     */
+    @DeleteMapping("/card/favor/{cardId}")
+    @ApiOperation(value = "카드 찜하기 취소", notes = "찜한 카드를 취소합니다.")
+    public ResponseEntity<String> favorCardRemove(Authentication authentication, @PathVariable Long cardId) {
+        AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
+        String userId = authDTO.getUserId();
+
+        return ResponseEntity.ok(cardService.cancelFavor(userId, cardId));
     }
 }
