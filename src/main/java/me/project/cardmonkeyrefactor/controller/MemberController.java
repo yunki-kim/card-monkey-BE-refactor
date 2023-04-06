@@ -38,7 +38,7 @@ public class MemberController {
 
         memberService.updatePassword(userId, req);
 
-        return ResponseEntity.ok("비밀번호가 변경 되었습니다.");
+        return ResponseEntity.ok("비밀번호변경 완료");
     }
 
     /**
