@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import me.project.cardmonkeyrefactor.dto.*;
 import me.project.cardmonkeyrefactor.entity.Benefit;
 import me.project.cardmonkeyrefactor.entity.Member;
+import me.project.cardmonkeyrefactor.exception.member.AlreadyUseIdException;
+import me.project.cardmonkeyrefactor.exception.member.MismatchCurrentPasswordException;
+import me.project.cardmonkeyrefactor.exception.member.MismatchLoginInfoException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.jwt.JwtProvider;
 import me.project.cardmonkeyrefactor.repository.MemberRepository;
@@ -23,10 +26,8 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public String join(SignupReqDTO req) {
-        if (memberRepository.existsByUserId(req.getUserId())) {
-            return req.getUserId() + "는 이미 존재하는 아이디 입니다.";
-        }
+    public void join(SignupReqDTO req) {
+        checkInUseUserId(req.getUserId());
 
         req.setPassword(encodingPassword(req.getPassword()));
         if (req.getRole() == null || req.getRole().equals("")) {
@@ -35,20 +36,14 @@ public class MemberService {
         Member member = req.toEntity(req.getBenefit());
 
         memberRepository.save(member);
-
-        return "회원가입 완료";
     }
 
     /**
      * 아이디 중복체크 (회원가입 시)
      */
     @Transactional(readOnly = true)
-    public String userIdValidation(ValidationDTO req) {
-        if (memberRepository.existsByUserId(req.getUserId())) {
-            return "1";
-        } else {
-            return null;
-        }
+    public void userIdValidation(ValidationDTO req) {
+        checkInUseUserId(req.getUserId());
     }
 
     /**
@@ -56,12 +51,9 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public LoginResDTO login(LoginReqDTO req) {
-        Member findMember = memberRepository.findByUserId(req.getUserId()).orElseThrow(
-                NoSuchMemberException::new);
-
-        if (!checkPassword(req.getPassword(), findMember.getPassword())) {
-            return new LoginResDTO("아이디 또는 비밀번호가 일치하지 않습니다.");
-        }
+        Member findMember = memberRepository.findByUserId(req.getUserId())
+                .filter(member -> checkPassword(req.getPassword(), member.getPassword()))
+                .orElseThrow(MismatchLoginInfoException::new);
 
         String createdToken = jwtProvider.makeToken(findMember);
         return LoginResDTO.builder()
@@ -76,35 +68,40 @@ public class MemberService {
     /**
      * 비밀번호 변경
      */
-    public String updatePassword(String userId, PasswordReqDTO req) {
+    public void updatePassword(String userId, PasswordReqDTO req) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
 
         if (!checkPassword(req.getCurrentPassword(), findMember.getPassword())) {
-            return "현재 비밀번호가 일치하지 않습니다.";
+            throw new MismatchCurrentPasswordException();
         }
         findMember.updatePassword(encodingPassword(req.getNewPassword()));
-        return "비밀번호가 변경 되었습니다.";
     }
 
     /**
      * 혜택 변경
      */
-    public String changeBenefit(String userId, ChangeBenefitReqDTO req) {
+    public void changeBenefit(String userId, ChangeBenefitReqDTO req) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
 
         findMember.updateBenefit(new Benefit(req.getBenefit()));
-
-        return "혜택변경 완료";
     }
 
     /**
      * 회원 탈퇴
      */
-    public String deleteAccount(String userId) {
+    public void deleteAccount(String userId) {
         memberRepository.deleteByUserId(userId);
-        return "회원탈퇴 완료";
+    }
+
+    /**
+     * 아이디 등록여부 확인
+     */
+    private void checkInUseUserId(String userId) {
+        if (memberRepository.existsByUserId(userId)) {
+           throw new AlreadyUseIdException();
+        }
     }
 
     /**

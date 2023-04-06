@@ -36,7 +36,9 @@ public class MemberController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(memberService.updatePassword(userId, req));
+        memberService.updatePassword(userId, req);
+
+        return ResponseEntity.ok("비밀번호변경 완료");
     }
 
     /**
@@ -48,7 +50,9 @@ public class MemberController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(memberService.changeBenefit(userId, req));
+        memberService.changeBenefit(userId, req);
+
+        return ResponseEntity.ok("혜택변경 완료");
     }
 
     /**
@@ -60,6 +64,8 @@ public class MemberController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(memberService.deleteAccount(userId));
+        memberService.deleteAccount(userId);
+
+        return ResponseEntity.ok("회원탈퇴 완료");
     }
 }

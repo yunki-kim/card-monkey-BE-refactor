@@ -32,7 +32,9 @@ public class AuthController {
     @PostMapping("/signup")
     @ApiOperation(value = "회원가입", notes = "회원가입을 수행합니다.")
     public ResponseEntity<String> signUp(@RequestBody @Valid SignupReqDTO req) {
-        return ResponseEntity.ok(memberService.join(req));
+        memberService.join(req);
+
+        return ResponseEntity.ok("회원가입 완료");
     }
 
     /**
@@ -41,7 +43,9 @@ public class AuthController {
     @PostMapping("/userIdValidation")
     @ApiOperation(value = "아이디 중복체크", notes = "회원가입시 아이디 중복체크를 수행합니다.")
     public ResponseEntity<String> userIdValidation(@RequestBody @Valid ValidationDTO req) {
-        return ResponseEntity.ok(memberService.userIdValidation(req));
+        memberService.userIdValidation(req);
+
+        return ResponseEntity.ok("사용가능한 아이디 입니다.");
     }
 
     /**
