@@ -24,7 +24,7 @@ public class MemberService {
     /**
      * 회원가입
      */
-    public String join(SignupReqDTO req) {
+    public void join(SignupReqDTO req) {
         checkInUseUserId(req.getUserId());
 
         req.setPassword(encodingPassword(req.getPassword()));
@@ -34,18 +34,14 @@ public class MemberService {
         Member member = req.toEntity(req.getBenefit());
 
         memberRepository.save(member);
-
-        return "회원가입 완료";
     }
 
     /**
      * 아이디 중복체크 (회원가입 시)
      */
     @Transactional(readOnly = true)
-    public String userIdValidation(ValidationDTO req) {
+    public void userIdValidation(ValidationDTO req) {
         checkInUseUserId(req.getUserId());
-
-        return null;
     }
 
     /**
@@ -73,35 +69,32 @@ public class MemberService {
     /**
      * 비밀번호 변경
      */
-    public String updatePassword(String userId, PasswordReqDTO req) {
+    public void updatePassword(String userId, PasswordReqDTO req) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
 
         if (!checkPassword(req.getCurrentPassword(), findMember.getPassword())) {
-            return "현재 비밀번호가 일치하지 않습니다.";
+            // return "현재 비밀번호가 일치하지 않습니다.";
+            return;
         }
         findMember.updatePassword(encodingPassword(req.getNewPassword()));
-        return "비밀번호가 변경 되었습니다.";
     }
 
     /**
      * 혜택 변경
      */
-    public String changeBenefit(String userId, ChangeBenefitReqDTO req) {
+    public void changeBenefit(String userId, ChangeBenefitReqDTO req) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
 
         findMember.updateBenefit(new Benefit(req.getBenefit()));
-
-        return "혜택변경 완료";
     }
 
     /**
      * 회원 탈퇴
      */
-    public String deleteAccount(String userId) {
+    public void deleteAccount(String userId) {
         memberRepository.deleteByUserId(userId);
-        return "회원탈퇴 완료";
     }
 
     /**
