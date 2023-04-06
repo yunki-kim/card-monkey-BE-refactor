@@ -6,6 +6,7 @@ import me.project.cardmonkeyrefactor.entity.Benefit;
 import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.exception.member.AlreadyUseIdException;
 import me.project.cardmonkeyrefactor.exception.member.MismatchCurrentPasswordException;
+import me.project.cardmonkeyrefactor.exception.member.MismatchLoginInfoException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.jwt.JwtProvider;
 import me.project.cardmonkeyrefactor.repository.MemberRepository;
@@ -50,12 +51,9 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public LoginResDTO login(LoginReqDTO req) {
-        Member findMember = memberRepository.findByUserId(req.getUserId()).orElseThrow(
-                NoSuchMemberException::new);
-
-        if (!checkPassword(req.getPassword(), findMember.getPassword())) {
-            return new LoginResDTO("아이디 또는 비밀번호가 일치하지 않습니다.");
-        }
+        Member findMember = memberRepository.findByUserId(req.getUserId())
+                .filter(member -> checkPassword(req.getPassword(), member.getPassword()))
+                .orElseThrow(MismatchLoginInfoException::new);
 
         String createdToken = jwtProvider.makeToken(findMember);
         return LoginResDTO.builder()
