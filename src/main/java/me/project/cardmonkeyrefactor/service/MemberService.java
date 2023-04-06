@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.project.cardmonkeyrefactor.dto.*;
 import me.project.cardmonkeyrefactor.entity.Benefit;
 import me.project.cardmonkeyrefactor.entity.Member;
+import me.project.cardmonkeyrefactor.exception.member.AlreadyUseIdException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.jwt.JwtProvider;
 import me.project.cardmonkeyrefactor.repository.MemberRepository;
@@ -24,9 +25,7 @@ public class MemberService {
      * 회원가입
      */
     public String join(SignupReqDTO req) {
-        if (memberRepository.existsByUserId(req.getUserId())) {
-            return req.getUserId() + "는 이미 존재하는 아이디 입니다.";
-        }
+        checkInUseUserId(req.getUserId());
 
         req.setPassword(encodingPassword(req.getPassword()));
         if (req.getRole() == null || req.getRole().equals("")) {
@@ -44,11 +43,9 @@ public class MemberService {
      */
     @Transactional(readOnly = true)
     public String userIdValidation(ValidationDTO req) {
-        if (memberRepository.existsByUserId(req.getUserId())) {
-            return "1";
-        } else {
-            return null;
-        }
+        checkInUseUserId(req.getUserId());
+
+        return null;
     }
 
     /**
@@ -105,6 +102,15 @@ public class MemberService {
     public String deleteAccount(String userId) {
         memberRepository.deleteByUserId(userId);
         return "회원탈퇴 완료";
+    }
+
+    /**
+     * 아이디 등록여부 확인
+     */
+    private void checkInUseUserId(String userId) {
+        if (memberRepository.existsByUserId(userId)) {
+           throw new AlreadyUseIdException();
+        }
     }
 
     /**
