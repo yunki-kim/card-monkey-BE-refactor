@@ -125,7 +125,9 @@ public class CardController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(cardService.savePaid(userId, cardId));
+        cardService.savePaid(userId, cardId);
+
+        return ResponseEntity.ok("카드신청 완료");
     }
 
     /**

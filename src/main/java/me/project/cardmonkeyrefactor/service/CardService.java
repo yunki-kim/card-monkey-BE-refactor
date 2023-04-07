@@ -6,6 +6,7 @@ import me.project.cardmonkeyrefactor.entity.Card;
 import me.project.cardmonkeyrefactor.entity.Favor;
 import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.entity.Paid;
+import me.project.cardmonkeyrefactor.exception.card.AlreadyPaidCardException;
 import me.project.cardmonkeyrefactor.exception.card.NoSuchCardException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.repository.CardRepository;
@@ -174,18 +175,17 @@ public class CardService {
      * 카드 신청
      */
     @Transactional
-    public String savePaid(String userId, Long cardId) {
+    public void savePaid(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (checkExistsPaid(findMember.getId(), findCard.getId())) {
-            return "이미 신청하신 카드입니다.";
+            throw new AlreadyPaidCardException();
         }
         Paid paid = Paid.createPaid(findMember, findCard);
         paidRepository.save(paid);
-        return "카드신청 완료";
     }
 
     /**
