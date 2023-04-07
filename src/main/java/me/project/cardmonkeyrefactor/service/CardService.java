@@ -8,6 +8,7 @@ import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.entity.Paid;
 import me.project.cardmonkeyrefactor.exception.card.AlreadyPaidCardException;
 import me.project.cardmonkeyrefactor.exception.card.NoSuchCardException;
+import me.project.cardmonkeyrefactor.exception.card.NoSuchPaidCardException;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.repository.CardRepository;
 import me.project.cardmonkeyrefactor.repository.FavorRepository;
@@ -192,17 +193,16 @@ public class CardService {
      * 카드 신청 취소
      */
     @Transactional
-    public String cancelPaid(String userId, Long cardId) {
+    public void cancelPaid(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (!checkExistsPaid(findMember.getId(), findCard.getId())) {
-            return "신청내역이 존재하지 않습니다.";
+            throw new NoSuchPaidCardException();
         }
         paidRepository.deleteByMemberIdAndCardId(findMember.getId(), findCard.getId());
-        return "카드신청 취소 완료";
     }
 
     /**

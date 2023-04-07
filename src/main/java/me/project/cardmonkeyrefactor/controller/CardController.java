@@ -139,7 +139,9 @@ public class CardController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(cardService.cancelPaid(userId, cardId));
+        cardService.cancelPaid(userId, cardId);
+
+        return ResponseEntity.ok("카드신청 취소 완료");
     }
 
     /**
