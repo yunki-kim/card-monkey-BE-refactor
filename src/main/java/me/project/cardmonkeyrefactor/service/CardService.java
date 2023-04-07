@@ -6,7 +6,7 @@ import me.project.cardmonkeyrefactor.entity.Card;
 import me.project.cardmonkeyrefactor.entity.Favor;
 import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.entity.Paid;
-import me.project.cardmonkeyrefactor.exception.card.NoSuchCardException;
+import me.project.cardmonkeyrefactor.exception.card.*;
 import me.project.cardmonkeyrefactor.exception.member.NoSuchMemberException;
 import me.project.cardmonkeyrefactor.repository.CardRepository;
 import me.project.cardmonkeyrefactor.repository.FavorRepository;
@@ -174,35 +174,33 @@ public class CardService {
      * 카드 신청
      */
     @Transactional
-    public String savePaid(String userId, Long cardId) {
+    public void savePaid(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (checkExistsPaid(findMember.getId(), findCard.getId())) {
-            return "이미 신청하신 카드입니다.";
+            throw new AlreadyPaidCardException();
         }
         Paid paid = Paid.createPaid(findMember, findCard);
         paidRepository.save(paid);
-        return "카드신청 완료";
     }
 
     /**
      * 카드 신청 취소
      */
     @Transactional
-    public String cancelPaid(String userId, Long cardId) {
+    public void cancelPaid(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (!checkExistsPaid(findMember.getId(), findCard.getId())) {
-            return "신청내역이 존재하지 않습니다.";
+            throw new NoSuchPaidCardException();
         }
         paidRepository.deleteByMemberIdAndCardId(findMember.getId(), findCard.getId());
-        return "카드신청 취소 완료";
     }
 
     /**
@@ -222,35 +220,33 @@ public class CardService {
      * 카드 찜하기
      */
     @Transactional
-    public String saveFavor(String userId, Long cardId) {
+    public void saveFavor(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (checkExistsFavor(findMember.getId(), findCard.getId())) {
-            return "이미 찜한 카드입니다.";
+            throw new AlreadyFavorCardException();
         }
         Favor favor = Favor.createFavor(findMember, findCard);
         favorRepository.save(favor);
-        return "찜하기 완료";
     }
 
     /**
      * 카드 찜하기 취소
      */
     @Transactional
-    public String cancelFavor(String userId, Long cardId) {
+    public void cancelFavor(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (!checkExistsFavor(findMember.getId(), findCard.getId())) {
-            return "찜하지 않은 카드입니다.";
+            throw new NoSuchFavorCardException();
         }
         favorRepository.deleteByMemberIdAndCardId(findMember.getId(), findCard.getId());
-        return "찜하기 취소 완료";
     }
 
     private boolean checkExistsPaid(Long memberId, Long cardId) {
