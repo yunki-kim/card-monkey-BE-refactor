@@ -167,6 +167,8 @@ public class CardController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(cardService.cancelFavor(userId, cardId));
+        cardService.cancelFavor(userId, cardId);
+
+        return ResponseEntity.ok("찜하기 취소 완료");
     }
 }
