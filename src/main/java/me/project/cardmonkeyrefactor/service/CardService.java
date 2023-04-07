@@ -6,6 +6,7 @@ import me.project.cardmonkeyrefactor.entity.Card;
 import me.project.cardmonkeyrefactor.entity.Favor;
 import me.project.cardmonkeyrefactor.entity.Member;
 import me.project.cardmonkeyrefactor.entity.Paid;
+import me.project.cardmonkeyrefactor.exception.card.AlreadyFavorCardException;
 import me.project.cardmonkeyrefactor.exception.card.AlreadyPaidCardException;
 import me.project.cardmonkeyrefactor.exception.card.NoSuchCardException;
 import me.project.cardmonkeyrefactor.exception.card.NoSuchPaidCardException;
@@ -222,18 +223,17 @@ public class CardService {
      * 카드 찜하기
      */
     @Transactional
-    public String saveFavor(String userId, Long cardId) {
+    public void saveFavor(String userId, Long cardId) {
         Member findMember = memberRepository.findByUserId(userId).orElseThrow(
                 NoSuchMemberException::new);
         Card findCard = cardRepository.findById(cardId).orElseThrow(
                 NoSuchCardException::new);
 
         if (checkExistsFavor(findMember.getId(), findCard.getId())) {
-            return "이미 찜한 카드입니다.";
+            throw new AlreadyFavorCardException();
         }
         Favor favor = Favor.createFavor(findMember, findCard);
         favorRepository.save(favor);
-        return "찜하기 완료";
     }
 
     /**

@@ -153,7 +153,9 @@ public class CardController {
         AuthDTO authDTO = (AuthDTO) authentication.getPrincipal();
         String userId = authDTO.getUserId();
 
-        return ResponseEntity.ok(cardService.saveFavor(userId, cardId));
+        cardService.saveFavor(userId, cardId);
+
+        return ResponseEntity.ok("찜하기 완료");
     }
 
     /**
